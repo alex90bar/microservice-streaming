@@ -73,6 +73,7 @@ deploy_prod_server:
     - develop
     - main
     - cicd
+    - test_streaming
   except:
     - tags
   before_script:
