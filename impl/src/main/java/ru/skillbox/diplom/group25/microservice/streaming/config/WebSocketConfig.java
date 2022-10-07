@@ -17,7 +17,7 @@ import ru.skillbox.diplom.group25.microservice.streaming.websocket.SocketTextHan
 public class WebSocketConfig implements WebSocketConfigurer {
 
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(new SocketTextHandler(), "/user");
+    registry.addHandler(new SocketTextHandler(), "api/v1/streaming/ws");
   }
 
 }
