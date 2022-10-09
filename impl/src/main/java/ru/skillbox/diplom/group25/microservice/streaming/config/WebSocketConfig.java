@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group25.microservice.streaming.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -16,8 +17,11 @@ import ru.skillbox.diplom.group25.microservice.streaming.websocket.SocketTextHan
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
+  @Value(value = "${socket_path}")
+  private String socketPath;
+
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(new SocketTextHandler(), "/socket");
+    registry.addHandler(new SocketTextHandler(), socketPath);
   }
 
 }

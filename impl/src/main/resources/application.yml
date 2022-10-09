@@ -53,3 +53,4 @@ kafka-concurrency: 5
 kafka-pollTimeout: 2000
 acks-timeout-mseconds: 2000
 pong_interval: 10000
+socket_path: ${SOCKET_PATH:api/v1/streaming/ws}
