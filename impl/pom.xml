@@ -29,16 +29,6 @@
             <version>${revision}${sha1}${changelist}</version>
         </dependency>
         <dependency>
-            <groupId>ru.skillbox.diplom.group25</groupId>
-            <artifactId>microservice-streaming-domain</artifactId>
-            <version>${revision}${sha1}${changelist}</version>
-        </dependency>
-        <dependency>
-            <groupId>ru.skillbox.diplom.group25</groupId>
-            <artifactId>microservice-streaming-db</artifactId>
-            <version>${revision}${sha1}${changelist}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
