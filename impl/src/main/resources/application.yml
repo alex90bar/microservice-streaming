@@ -27,23 +27,23 @@ spring:
               type:
                 headers: false
       acks: 1
-
-  datasource:
-    url: jdbc:${DATABASE_URL:postgresql://localhost:5432/skillbox}
-    username: ${USER_DB:post-service}
-    password: ${PASS_DB:post-service}
-    driverClassName: org.postgresql.Driver
-
-  jpa:
-    show-sql: false
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        format_sql: true
-#        default_schema: streaming
-    open-in-view: false
+# //TODO убрать все что связано с базой db и model модули
+#  datasource:
+#    url: jdbc:${DATABASE_URL:postgresql://localhost:5432/skillbox}
+#    username: ${USER_DB:post-service}
+#    password: ${PASS_DB:post-service}
+#    driverClassName: org.postgresql.Driver
+#
+#  jpa:
+#    show-sql: false
+#    hibernate:
+#      ddl-auto: none
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+#        format_sql: true
+##        default_schema: streaming
+#    open-in-view: false
 
 kafka-topics:
   topic_test: topic_test
