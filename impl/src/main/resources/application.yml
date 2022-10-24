@@ -17,7 +17,7 @@ spring:
     change-log: classpath:database-streaming-changelog.xml
 
   kafka:
-    bootstrap-servers: ${KAFKA_HOST:localhost:29092}
+    bootstrap-servers: ${KAFKA_HOST:localhost:9092}
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
