@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
   private String socketPath;
 
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(new SocketTextHandler(), socketPath);
+    registry.addHandler(new SocketTextHandler(), socketPath).setAllowedOriginPatterns("*");
   }
 
 }

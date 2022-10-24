@@ -19,7 +19,8 @@ import ru.skillbox.diplom.group25.library.core.annotation.EnableSecurity;
 @EnableSecurity
 //@EnableFeignClients
 @EnableDiscoveryClient
-@SpringBootApplication //отключение Security через exclude
+@SpringBootApplication (exclude = {SecurityAutoConfiguration.class,
+        ManagementWebSecurityAutoConfiguration.class})//отключение Security через exclude
 public class Application {
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
