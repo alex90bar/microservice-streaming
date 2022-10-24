@@ -21,6 +21,8 @@ public class SocketTextHandler extends TextWebSocketHandler {
   public void handleTextMessage(WebSocketSession session, TextMessage message)
       throws IOException {
 
+    session.getHandshakeHeaders().forEach((s, strings) -> log.info(s));
+    log.info(session.getUri().toString());
     String payload = message.getPayload();
     log.info("Received message: {}", payload);
 

@@ -24,3 +24,14 @@ management:
       enabled: true
     prometheus:
       enabled: true
+
+---
+spring:
+  cloud:
+    kubernetes:
+      enabled: false
+      loadbalancer:
+        enabled: false
+  config:
+    activate:
+      on-profile: local, test
