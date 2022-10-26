@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group25.microservice.streaming.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -15,13 +16,16 @@ import ru.skillbox.diplom.group25.microservice.streaming.websocket.SocketTextHan
 
 @Configuration
 @EnableWebSocket
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
+
+  private final SocketTextHandler socketTextHandler;
 
   @Value(value = "${socket_path}")
   private String socketPath;
 
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(new SocketTextHandler(), socketPath).setAllowedOriginPatterns("*");
+    registry.addHandler(socketTextHandler, socketPath).setAllowedOriginPatterns("*");
   }
 
 }

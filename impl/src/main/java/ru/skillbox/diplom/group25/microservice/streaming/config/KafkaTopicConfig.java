@@ -22,6 +22,8 @@ public class KafkaTopicConfig {
   private String bootstrapAddress;
   @Value(value = "${kafka-topics.topic_test}")
   private String topicTest;
+  @Value(value = "${kafka-topics.streaming_dialogs}")
+  private String topicStreamingDialogs;
 
 
   @Bean
@@ -34,6 +36,10 @@ public class KafkaTopicConfig {
   @Bean
   public NewTopic topicTest() {
     return new NewTopic(topicTest, 1, (short) 1);
+  }
+  @Bean
+  public NewTopic topicStreamingDialogs() {
+    return new NewTopic(topicStreamingDialogs, 1, (short) 1);
   }
 
 }

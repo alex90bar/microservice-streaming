@@ -27,18 +27,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaService {
 
-  private final KafkaTemplate<String, Object> kafkaTemplate;
-  @Value(value = "${acks-timeout-mseconds}")
-  private Integer acksTimeoutMseconds;
-
-  public void sendMessage(String topic, String key, Object msg) {
-    try {
-      kafkaTemplate.send(topic, key, msg).get(acksTimeoutMseconds, TimeUnit.MILLISECONDS);
-    } catch (ExecutionException | InterruptedException | TimeoutException e) {
-      log.error("Таймаут отправки сообщения - возможно, нет связи с Kafka! {} , stackTrace {}", e, Arrays.toString(e.getStackTrace()));
-    }
-    log.info("Отправка через Kafka в топик: {} сообщение: {}", topic, msg);
-  }
 
 
   @KafkaListener(topics = "${kafka-topics.topic_test}")

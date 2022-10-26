@@ -17,14 +17,14 @@ import ru.skillbox.diplom.group25.microservice.streaming.dto.StreamingDto;
 @RequiredArgsConstructor
 public class StreamingService {
 
-  private final KafkaService kafkaService;
+  private final KafkaSender kafkaSender;
   @Value(value = "${kafka-topics.topic_test}")
   private String topicTest;
 
 
   public void create(StreamingDto dto) {
     log.info("create begins with : {}", dto);
-    kafkaService.sendMessage(topicTest, "new key", dto);
+    kafkaSender.sendMessage(topicTest, "new key", dto);
   }
 }
 
