@@ -2,6 +2,8 @@ package ru.skillbox.diplom.group25.microservice.streaming.websocket;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jwt.JWTClaimsSet;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +13,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import ru.skillbox.diplom.group25.library.core.util.TokenUtil;
 import ru.skillbox.diplom.group25.microservice.streaming.dto.DialogMessage;
 import ru.skillbox.diplom.group25.microservice.streaming.service.KafkaSender;
 import ru.skillbox.diplom.group25.microservice.streaming.utils.ContextUtils;
@@ -35,14 +36,43 @@ public class SocketTextHandler extends TextWebSocketHandler {
   private String topicStreamingDialogs;
 
   /**
+   * Метод для извлечения userId текущего пользователя из jwt-токена
+   * */
+  private Long getCurrentUserIdFromJwt(String token){
+
+    log.info("Token: {}", token);
+    token = token.substring(7);
+    log.info("Token cropped: {}", token);
+
+    JWSObject jwsObject;
+    JWTClaimsSet claims = null;
+
+    try {
+      jwsObject = JWSObject.parse(token);
+      claims =  JWTClaimsSet.parse(jwsObject.getPayload().toJSONObject());
+    } catch (java.text.ParseException e) {
+      log.error("Error jwt parsing: {}", e.getMessage());
+
+    }
+
+    Long id = (Long) claims.getClaim("id");
+
+    log.info("current userId id from jwt: {}", id);
+
+    return id;
+
+  }
+
+  /**
    * При установке соединения добавляем текущего пользователя в context для отслеживания его состояния "онлайн"
    * */
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
-    Thread.sleep(500);
+    String token = session.getHandshakeHeaders().get("Authorization").get(0);
+    log.info("jwt token from WebSocketSession Headers: {}", token);
 
-    Long userId = TokenUtil.getJwtInfo().getId();
+    Long userId = getCurrentUserIdFromJwt(token);
 
     log.info("Connection established with userId: {}", userId);
 
@@ -56,7 +86,10 @@ public class SocketTextHandler extends TextWebSocketHandler {
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 
-    Long userId = TokenUtil.getJwtInfo().getId();
+    String token = session.getHandshakeHeaders().get("Authorization").get(0);
+    log.info("jwt token from WebSocketSession Headers: {}", token);
+
+    Long userId = getCurrentUserIdFromJwt(token);
 
     log.info("Connection closed with userId: {}", userId);
 
