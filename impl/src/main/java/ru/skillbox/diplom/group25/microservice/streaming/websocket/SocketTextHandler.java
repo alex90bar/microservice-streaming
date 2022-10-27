@@ -40,6 +40,8 @@ public class SocketTextHandler extends TextWebSocketHandler {
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
+    Thread.sleep(1000);
+
     Long userId = TokenUtil.getJwtInfo().getId();
 
     log.info("Connection established with userId: {}", userId);
