@@ -31,6 +31,7 @@ spring:
 kafka-topics:
   topic_test: topic_test
   streaming_dialogs: streaming_dialogs
+  dialogs_streaming: dialogs_streaming
 
 kafka-groupId: microservice-streaming
 kafka-concurrency: 5
@@ -38,3 +39,10 @@ kafka-pollTimeout: 2000
 acks-timeout-mseconds: 2000
 pong_interval: 10000
 socket_path: ${SOCKET_PATH:api/v1/streaming/ws}
+
+java:
+  concurrent:
+    corePoolSize: 10
+    maximumPoolSize: 20
+    queueCapacity: 200
+    keepAliveSeconds: 60

@@ -42,7 +42,6 @@ public class SocketTextHandler extends TextWebSocketHandler {
 
     log.info("Token: {}", token);
     token = token.substring(7);
-    log.info("Token cropped: {}", token);
 
     JWSObject jwsObject;
     JWTClaimsSet claims = null;
@@ -57,7 +56,7 @@ public class SocketTextHandler extends TextWebSocketHandler {
 
     Long id = (Long) claims.getClaim("id");
 
-    log.info("current userId id from jwt: {}", id);
+    log.info("current userId id from jwt from WebSocketSession Headers: {}", id);
 
     return id;
 
@@ -67,10 +66,9 @@ public class SocketTextHandler extends TextWebSocketHandler {
    * При установке соединения добавляем текущего пользователя в context для отслеживания его состояния "онлайн"
    * */
   @Override
-  public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+  public void afterConnectionEstablished(WebSocketSession session) {
 
     String token = session.getHandshakeHeaders().get("Authorization").get(0);
-    log.info("jwt token from WebSocketSession Headers: {}", token);
 
     Long userId = getCurrentUserIdFromJwt(token);
 
@@ -84,10 +82,9 @@ public class SocketTextHandler extends TextWebSocketHandler {
    * При разрыве соединения удаляем текущего пользователя из context, теперь он не "онлайн"
    * */
   @Override
-  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 
     String token = session.getHandshakeHeaders().get("Authorization").get(0);
-    log.info("jwt token from WebSocketSession Headers: {}", token);
 
     Long userId = getCurrentUserIdFromJwt(token);
 
@@ -111,19 +108,8 @@ public class SocketTextHandler extends TextWebSocketHandler {
 
       DialogMessage dialogMessage = objectMapper.readValue(payload, DialogMessage.class);
       kafkaSender.sendMessage(topicStreamingDialogs, null, dialogMessage);
-
-      //Если получатель сообщения онлайн, отправляем сообщение ему в сокет
-      if (contextUtils.contextContains(dialogMessage.getAccountId())){
-        contextUtils.getFromContext(dialogMessage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(dialogMessage)));
-        log.info("sent to WebSocket: {}", dialogMessage);
-      }
-
     }
 
-
-
-
-//    session.sendMessage(new TextMessage("Received message: " + payload));
   }
 
 }
