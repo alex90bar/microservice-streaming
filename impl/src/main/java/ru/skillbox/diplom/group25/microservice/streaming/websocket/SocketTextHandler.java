@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jwt.JWTClaimsSet;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import ru.skillbox.diplom.group25.microservice.streaming.dto.AccountOnlineDto;
 import ru.skillbox.diplom.group25.microservice.streaming.dto.DialogMessage;
 import ru.skillbox.diplom.group25.microservice.streaming.service.KafkaSender;
 import ru.skillbox.diplom.group25.microservice.streaming.utils.ContextUtils;
@@ -34,6 +36,8 @@ public class SocketTextHandler extends TextWebSocketHandler {
 
   @Value(value = "${kafka-topics.streaming_dialogs}")
   private String topicStreamingDialogs;
+  @Value(value = "${kafka-topics.streaming_account}")
+  private String topicStreamingAccount;
 
   /**
    * Метод для извлечения userId текущего пользователя из jwt-токена
@@ -74,6 +78,11 @@ public class SocketTextHandler extends TextWebSocketHandler {
 
     log.info("Connection established with userId: {}", userId);
 
+    AccountOnlineDto accountOnlineDto = new AccountOnlineDto(userId, null, true);
+
+    //отправляем сообщение в аккаунт-сервис для смены статуса пользователя на "онлайн"
+    kafkaSender.sendMessage(topicStreamingAccount, null, accountOnlineDto);
+
     contextUtils.putToContext(userId, session);
 
   }
@@ -89,6 +98,12 @@ public class SocketTextHandler extends TextWebSocketHandler {
     Long userId = getCurrentUserIdFromJwt(token);
 
     log.info("Connection closed with userId: {}", userId);
+
+    AccountOnlineDto accountOnlineDto = new AccountOnlineDto(userId, ZonedDateTime.now(), false);
+
+    //отправляем сообщение в аккаунт-сервис для смены статуса пользователя на "офлайн", фиксируем дату выхода из онлайн
+    //для отображения на фронте поля с датой "последний раз был в..."
+    kafkaSender.sendMessage(topicStreamingAccount, null, accountOnlineDto);
 
     contextUtils.removeFromContext(userId);
   }

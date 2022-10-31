@@ -26,6 +26,8 @@ public class KafkaTopicConfig {
   private String topicStreamingDialogs;
   @Value(value = "${kafka-topics.dialogs_streaming}")
   private String topicDialogsStreaming;
+  @Value(value = "${kafka-topics.streaming_account}")
+  private String topicStreamingAccount;
 
   @Bean
   public KafkaAdmin kafkaAdmin() {
@@ -45,6 +47,10 @@ public class KafkaTopicConfig {
   @Bean
   public NewTopic topicDialogsStreaming() {
     return new NewTopic(topicDialogsStreaming, 1, (short) 1);
+  }
+  @Bean
+  public NewTopic topicStreamingAccount() {
+    return new NewTopic(topicStreamingAccount, 1, (short) 1);
   }
 
 }

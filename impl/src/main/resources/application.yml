@@ -31,7 +31,10 @@ spring:
 kafka-topics:
   topic_test: topic_test
   streaming_dialogs: streaming_dialogs
+  streaming_account: streaming_account
+
   dialogs_streaming: dialogs_streaming
+
 
 kafka-groupId: microservice-streaming
 kafka-concurrency: 5

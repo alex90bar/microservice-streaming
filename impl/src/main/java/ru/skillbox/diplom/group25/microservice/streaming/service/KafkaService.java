@@ -52,7 +52,7 @@ public class KafkaService {
   @KafkaListener(topics = "${kafka-topics.dialogs_streaming}")
   public void listenDialogsStreaming(ConsumerRecord<String, JsonNode> myRecord) throws IOException {
 
-    log.info("Получено сообщение в топик streaming_dialogs, key {} value {}", myRecord.key(), myRecord.value());
+    log.info("Получено сообщение в топик dialogs_streaming, key {} value {}", myRecord.key(), myRecord.value());
 
     DialogMessage dialogMessage;
 
@@ -66,7 +66,7 @@ public class KafkaService {
     //Если получатель сообщения онлайн, отправляем сообщение ему в сокет
     if (contextUtils.contextContains(dialogMessage.getAccountId())){
       contextUtils.getFromContext(dialogMessage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(dialogMessage)));
-      log.info("sent to WebSocket: {}", dialogMessage);
+      log.info("UserId {} is online, sent to WebSocket: {}",dialogMessage.getAccountId(), dialogMessage);
     }
 
 
