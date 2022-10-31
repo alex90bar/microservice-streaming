@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import ru.skillbox.diplom.group25.microservice.streaming.dto.DialogMessage;
+import ru.skillbox.diplom.group25.microservice.streaming.dto.NotificationInputDto;
 import ru.skillbox.diplom.group25.microservice.streaming.utils.ContextUtils;
 
 /**
@@ -38,7 +39,7 @@ public class KafkaService {
 
 
   @KafkaListener(topics = "${kafka-topics.topic_test}")
-  public void listenTopicTest(ConsumerRecord<String, JsonNode> myRecord){
+  public void listenTopicTest(ConsumerRecord<String, JsonNode> myRecord) {
 
     log.info("Получено сообщение в topic_test, key {} value {}", myRecord.key(), myRecord.value());
 
@@ -47,7 +48,7 @@ public class KafkaService {
 
   /**
    * Уведомление о получении сообщения и сохранения его в БД
-   * */
+   */
   @Async("taskExecutor")
   @KafkaListener(topics = "${kafka-topics.dialogs_streaming}")
   public void listenDialogsStreaming(ConsumerRecord<String, JsonNode> myRecord) throws IOException {
@@ -64,17 +65,30 @@ public class KafkaService {
     }
 
     //Если получатель сообщения онлайн, отправляем сообщение ему в сокет
-    if (contextUtils.contextContains(dialogMessage.getAccountId())){
+    if (contextUtils.contextContains(dialogMessage.getAccountId())) {
       contextUtils.getFromContext(dialogMessage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(dialogMessage)));
-      log.info("UserId {} is online, sent to WebSocket: {}",dialogMessage.getAccountId(), dialogMessage);
+      log.info("UserId {} is online, sent to WebSocket: {}", dialogMessage.getAccountId(), dialogMessage);
     }
-
-
   }
 
+  @Async("taskExecutor")
+  @KafkaListener(topics = "${kafka-topics.notifications_streaming}")
+  public void listenNotificationsStreaming(ConsumerRecord<String, JsonNode> myRecord) throws IOException {
 
+    log.info("Получено сообщение в топик notifications_streaming, key {} value {}", myRecord.key(), myRecord.value());
 
+    NotificationInputDto notificationInputDto;
 
-}
+    try {
+      notificationInputDto = objectMapper.treeToValue(myRecord.value(), NotificationInputDto.class);
+    } catch (JsonProcessingException e) {
+      log.error("Error reading message: {}", e.getMessage());
+      return;
+    }
+      contextUtils.getFromContext(notificationInputDto.getUserId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(notificationInputDto)));
+      log.info("Sent to WebSocket: {}", notificationInputDto.getUserId());
+    }
+  }
+
 
 

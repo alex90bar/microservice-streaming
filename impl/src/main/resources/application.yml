@@ -34,6 +34,8 @@ kafka-topics:
   streaming_account: streaming_account
 
   dialogs_streaming: dialogs_streaming
+  notifications_streaming: notification_streaming
+
 
 
 kafka-groupId: microservice-streaming
