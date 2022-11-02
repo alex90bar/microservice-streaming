@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationInputDto {
-    private Long Id;
-    private AuthorDto author;
-    private NotificationType type;
-    private String content;
-    private Long timeStamp;
+public class AuthorDto {
+    private String photo;
+    private String firstName;
+    private String lastName;
 }
