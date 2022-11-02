@@ -4,23 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import ru.skillbox.diplom.group25.microservice.streaming.dto.DialogMessage;
-import ru.skillbox.diplom.group25.microservice.streaming.dto.NotificationInputDto;
+import ru.skillbox.diplom.group25.microservice.streaming.dto.NotificationMassage;
 import ru.skillbox.diplom.group25.microservice.streaming.utils.ContextUtils;
 
 /**
@@ -77,16 +69,18 @@ public class KafkaService {
 
     log.info("Получено сообщение в топик notifications_streaming, key {} value {}", myRecord.key(), myRecord.value());
 
-    NotificationInputDto notificationInputDto;
+    NotificationMassage notificationMassage;
 
     try {
-      notificationInputDto = objectMapper.treeToValue(myRecord.value(), NotificationInputDto.class);
+      notificationMassage = objectMapper.treeToValue(myRecord.value(), NotificationMassage.class);
     } catch (JsonProcessingException e) {
       log.error("Error reading message: {}", e.getMessage());
       return;
     }
-      contextUtils.getFromContext(notificationInputDto.getUserId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(notificationInputDto)));
-      log.info("Sent to WebSocket: {}", notificationInputDto.getUserId());
+      if (contextUtils.contextContains(notificationMassage.getAccountId())) {
+        contextUtils.getFromContext(notificationMassage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(notificationMassage)));
+        log.info("UserId {} is online, sent to WebSocket: {}", notificationMassage.getAccountId(), notificationMassage);
+      }
     }
   }
 
