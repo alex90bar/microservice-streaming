@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class NotificationInputDto {
     private Long Id;
     private AuthorDto author;
-    private NotificationType type;
+    private NotificationType notificationType;
     private String content;
-    private Long timeStamp;
+    private Long timestamp;
 }
