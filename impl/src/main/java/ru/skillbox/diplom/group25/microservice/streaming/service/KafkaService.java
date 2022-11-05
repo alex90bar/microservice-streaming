@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import ru.skillbox.diplom.group25.microservice.streaming.dto.DialogMessage;
-import ru.skillbox.diplom.group25.microservice.streaming.dto.NotificationMassage;
+import ru.skillbox.diplom.group25.microservice.streaming.dto.NotificationMessage;
 import ru.skillbox.diplom.group25.microservice.streaming.utils.ContextUtils;
 
 /**
@@ -69,17 +69,17 @@ public class KafkaService {
 
     log.info("Получено сообщение в топик notifications_streaming, key {} value {}", myRecord.key(), myRecord.value());
 
-    NotificationMassage notificationMassage;
+    NotificationMessage notificationMessage;
 
     try {
-      notificationMassage = objectMapper.treeToValue(myRecord.value(), NotificationMassage.class);
+      notificationMessage = objectMapper.treeToValue(myRecord.value(), NotificationMessage.class);
     } catch (JsonProcessingException e) {
       log.error("Error reading message: {}", e.getMessage());
       return;
     }
-      if (contextUtils.contextContains(notificationMassage.getAccountId())) {
-        contextUtils.getFromContext(notificationMassage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(notificationMassage)));
-        log.info("UserId {} is online, sent to WebSocket: {}", notificationMassage.getAccountId(), notificationMassage);
+      if (contextUtils.contextContains(notificationMessage.getAccountId())) {
+        contextUtils.getFromContext(notificationMessage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(notificationMessage)));
+        log.info("UserId {} is online, sent to WebSocket: {}", notificationMessage.getAccountId(), notificationMessage);
       }
     }
   }

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationMassage {
+public class NotificationMessage {
     private String type = "NOTIFICATION";
     private Long accountId;
-    private NotificationInputDto data;
+    private NotificationMessageDto data;
 }
