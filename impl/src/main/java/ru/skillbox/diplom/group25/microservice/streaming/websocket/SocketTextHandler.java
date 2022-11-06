@@ -108,6 +108,9 @@ public class SocketTextHandler extends TextWebSocketHandler {
     contextUtils.removeFromContext(userId);
   }
 
+  /**
+   * Метод обработки входящего сообщения
+   * */
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message)
       throws IOException {

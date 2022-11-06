@@ -39,7 +39,7 @@ public class KafkaService {
 
 
   /**
-   * Уведомление о получении сообщения и сохранения его в БД
+   * Уведомление о получении сообщения и сохранения его в БД от microservice-dialog
    */
   @Async("taskExecutor")
   @KafkaListener(topics = "${kafka-topics.dialogs_streaming}")
@@ -47,20 +47,16 @@ public class KafkaService {
 
     log.info("Получено сообщение в топик dialogs_streaming, key {} value {}", myRecord.key(), myRecord.value());
 
-    DialogMessage dialogMessage;
+    DialogMessage dialogMessage = mapJsonToObject(myRecord, DialogMessage.class);
 
-    try {
-      dialogMessage = objectMapper.treeToValue(myRecord.value(), DialogMessage.class);
-    } catch (JsonProcessingException e) {
-      log.error("Error reading message: {}", e.getMessage());
-      return;
+    if (dialogMessage != null) {
+      //Если получатель сообщения онлайн, отправляем сообщение ему в сокет
+      if (contextUtils.contextContains(dialogMessage.getAccountId())) {
+        contextUtils.getFromContext(dialogMessage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(dialogMessage)));
+        log.info("UserId {} is online, sent to WebSocket: {}", dialogMessage.getAccountId(), dialogMessage);
+      }
     }
 
-    //Если получатель сообщения онлайн, отправляем сообщение ему в сокет
-    if (contextUtils.contextContains(dialogMessage.getAccountId())) {
-      contextUtils.getFromContext(dialogMessage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(dialogMessage)));
-      log.info("UserId {} is online, sent to WebSocket: {}", dialogMessage.getAccountId(), dialogMessage);
-    }
   }
 
   @Async("taskExecutor")
@@ -69,20 +65,30 @@ public class KafkaService {
 
     log.info("Получено сообщение в топик notifications_streaming, key {} value {}", myRecord.key(), myRecord.value());
 
-    NotificationMessage notificationMessage;
+    NotificationMessage notificationMessage = mapJsonToObject(myRecord, NotificationMessage.class);
 
-    try {
-      notificationMessage = objectMapper.treeToValue(myRecord.value(), NotificationMessage.class);
-    } catch (JsonProcessingException e) {
-      log.error("Error reading message: {}", e.getMessage());
-      return;
-    }
+    if (notificationMessage != null) {
       if (contextUtils.contextContains(notificationMessage.getAccountId())) {
-        contextUtils.getFromContext(notificationMessage.getAccountId()).sendMessage(new TextMessage(objectMapper.writeValueAsString(notificationMessage)));
+        contextUtils.getFromContext(notificationMessage.getAccountId())
+            .sendMessage(new TextMessage(objectMapper.writeValueAsString(notificationMessage)));
         log.info("UserId {} is online, sent to WebSocket: {}", notificationMessage.getAccountId(), notificationMessage);
       }
     }
   }
 
 
+  /**
+   * Метод для преобразования входящего сообщения по kafka из формата Json в Object
+   */
+  private <T> T mapJsonToObject(ConsumerRecord<String, JsonNode> myRecord, Class<T> valueType) {
+
+    try {
+      return objectMapper.treeToValue(myRecord.value(), valueType);
+    } catch (JsonProcessingException e) {
+      log.error("Error reading message: {}", e.getMessage());
+      return null;
+    }
+  }
+
+}
 
