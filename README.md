@@ -5,6 +5,8 @@ diplom-group25 - это учебный проект на Spring Boot, состо
 <br> Мною реализовано 4 микросервиса, один из них - microservice-streaming.
 <br> Ссылка на стенд: http://130.61.44.151/login
 
+<br> Презентация проекта: https://www.youtube.com/watch?v=wHGmJVBqXho
+
 <br> microservice-streaming отвечает за следующий функционал:
 <br> - работа с входящими сообщениями диалога (получение сообщения от frontend-service через WebSocketSession, пересылка полученного сообщения в microservice-dialog с помощью Apache Kafka)
 <br> - работа с исходящими сообщениями диалога (получение уведомления о полученном сообщении от microservice-dialog с помощью Apache Kafka, перенаправление сообщения во frontend-service через WebSocketSession для трансляции сообщения пользователю, при условии, что он - онлайн, и у него открыт активный диалог)
